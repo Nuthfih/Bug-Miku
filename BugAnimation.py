@@ -96,7 +96,22 @@ def main():
         {"time": 61.8, "action": "print", "text": "Saa ba-ba-bagu sa bagubagu"},
         {"time": 64.2, "action": "print", "text": "Kotae taedae iyaiya, iya"},
         {"time": 66.2, "action": "print", "text": "Iyaiya, iya"},
-        # Berhenti di kisaran waktu 1:08 (68.0 detik)
+        
+        # --- [GLITCH / VIRUS SEQUENCE: 68s - 78s] ---
+        {"time": 68.0, "action": "clear"},
+        {"time": 68.5, "action": "type", "text": "WARNING: CRITICAL SYSTEM ERROR"},
+        {"time": 69.5, "action": "print", "text": "0x0A2B44: NullPointerException in module 'HEART'"},
+        {"time": 70.0, "action": "print", "text": "0x0A2B48: Memory dump starting..."},
+        {"time": 70.5, "action": "type", "text": "01001101 01000001 01001001 01000111 01001111"},
+        {"time": 71.5, "action": "type", "text": "01000010 01010101 01000111 00100000 01000010 01010101 01000111"},
+        {"time": 72.5, "action": "print", "text": "FATAL: ERR_CONNECTION_RESET"},
+        {"time": 73.0, "action": "print", "text": "! OVERLOAD ! OVERLOAD ! OVERLOAD !"},
+        {"time": 73.5, "action": "clear"},
+        {"time": 73.6, "action": "art", "target": "3_error.txt"},
+        {"time": 74.0, "action": "print", "text": "DATA CORRUPTION AT SECTOR 9..."},
+        {"time": 75.0, "action": "print", "text": "ATTEMPTING SYSTEM REBOOT..."},
+        {"time": 76.5, "action": "clear"},
+        {"time": 77.0, "action": "type", "text": "System Reboot OK. Resuming..."},
 
         # [Verse 3] - Starts at 1:19 (79s)
         {"time": 78.8, "action": "clear"},
