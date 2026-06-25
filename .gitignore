@@ -1,0 +1,4 @@
+ExecuteMe/
+__pycache__/
+*.pyc
+*.pyo
