@@ -1,6 +1,15 @@
- [ ERROR ] [ ERROR ] [ ERROR ]
- 
-   SYSTEM MALFUNCTION
-   CODE: B U G
-   
- [ ERROR ] [ ERROR ] [ ERROR ]
+
+ +-----------------------------------------+
+ |  !! SYSTEM MALFUNCTION DETECTED !!      |
+ |  CODE : B U G  /  S T A T U S : FATAL  |
+ +-----------------------------------------+
+
+ UnhandledException: NullReferenceException
+   at Heart.feel() in emotion.dll : line 404
+   at Soul.process() in soul.dll  : line 0
+   at Brain.think() in mind.dll   : line ???
+
+ ERROR 0xDEADC0DE : emotion.dll has crashed
+ ERROR 0xBAADF00D : memory.core is corrupted
+
+ [ ERROR ] [ ERROR ] [ ERROR ] [ ERROR ]

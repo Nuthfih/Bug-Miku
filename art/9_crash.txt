@@ -1,0 +1,16 @@
+
+ +--------------------------------------------------+
+ |                                                  |
+ |  BUG-MIKU OS  -  FATAL SYSTEM ERROR              |
+ |                                                  |
+ |  Your system ran into a problem and needs to     |
+ |  restart.                                        |
+ |                                                  |
+ |  STOP CODE:  BUG_PARANOIA_EXCEPTION              |
+ |  MODULE:     heart.dll                           |
+ |  ADDRESS:    0x000000DEADC0DE                    |
+ |                                                  |
+ |  For more info:                                  |
+ |  https://miku.os/bug-paranoia                    |
+ |                                                  |
+ +--------------------------------------------------+

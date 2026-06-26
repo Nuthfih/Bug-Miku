@@ -1,0 +1,14 @@
+
+ <<<<  V I R U S  D E T E C T E D  >>>>
+
+  [>>] Scanning : ################  100%
+  [!!] Infected : heart.dll
+  [!!] Infected : soul.core
+  [!!] Infected : emotion.exe
+  [>>] Threat   : BUG/Paranoia.A
+  [>>] Severity : CRITICAL
+
+   0101 0110 0100 1001 0101 0010 0101 0101
+   0101 0011 < B > < U > < G > 0101 0011
+
+ <<<< QUARANTINE FAILED : TOO DEEP >>>>
