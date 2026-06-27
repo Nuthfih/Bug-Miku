@@ -169,30 +169,93 @@ def flash_screen(times=2, delay=0.07):
         time.sleep(delay)
 
 
-def autocorrect_text(original, corrected, speed=0.03, backspace_speed=0.035):
+def autocorrect_text(text_before, original_word, corrected_word, text_after='',
+                     speed=0.03, block_flash=1):
     """
-    Ketik teks asli, flash (seperti autocorrect gagal),
-    hapus pakai backspace, lalu ketik teks yang benar.
+    Efek autocorrect bergaya text-editor block-selection:
+
+    1. Ketik text_before  (bagian sebelum kata yang akan dikoreksi)
+    2. Ketik original_word  (kata yang salah)
+    3. PAUSE — lalu flash/highlight original_word  (efek blok seleksi)
+    4. Overwrite original_word dengan corrected_word di tempat
+       (pakai ANSI cursor-move, bukan backspace)
+    5. Lanjut ketik text_after  (sisa kalimat)
+
+    Contoh:
+        text_before   = 'Giko giko '
+        original_word = 'mai kokoro'
+        corrected_word= 'my heart'
+        text_after    = ' sentei'
+    Hasil:
+        Giko giko mai kokoro  -->  [block]  -->  Giko giko my heart sentei
     """
+    # ── 1. Ketik bagian sebelum kata yang akan dikoreksi ──────────────
     sys.stdout.write(WHITE)
-    for char in original:
+    for char in text_before:
         sys.stdout.write(char)
         sys.stdout.flush()
         time.sleep(speed)
     sys.stdout.write(RESET)
-    time.sleep(0.3)
 
-    flash_screen(times=3, delay=0.06)
-    time.sleep(0.1)
-
-    for _ in range(len(original)):
-        sys.stdout.write('\b \b')
+    # ── 2. Ketik original_word ────────────────────────────────────────
+    sys.stdout.write(WHITE)
+    for char in original_word:
+        sys.stdout.write(char)
         sys.stdout.flush()
-        time.sleep(backspace_speed)
-    time.sleep(0.15)
+        time.sleep(speed)
+    sys.stdout.write(RESET)
+    sys.stdout.flush()
+    time.sleep(0.35)
+
+    word_len = len(original_word)
+
+    # ── 3. Flash / block-selection highlight ─────────────────────────
+    # \033[{n}D = gerakkan kursor ke kiri n kolom (tanpa menghapus teks)
+    for _ in range(block_flash):
+        # Kursor mundur ke awal kata
+        sys.stdout.write(f'\033[{word_len}D')
+        sys.stdout.flush()
+        # Tulis dengan efek reverse-video (blok highlight)
+        sys.stdout.write('\033[7m' + YELLOW + original_word + '\033[0m')
+        sys.stdout.flush()
+        time.sleep(0.18)
+        # Kursor mundur lagi
+        sys.stdout.write(f'\033[{word_len}D')
+        sys.stdout.flush()
+        # Tulis normal kembali
+        sys.stdout.write(WHITE + original_word + RESET)
+        sys.stdout.flush()
+        time.sleep(0.13)
+
+    # Stay highlighted sekali lagi sebelum di-replace
+    sys.stdout.write(f'\033[{word_len}D')
+    sys.stdout.flush()
+    sys.stdout.write('\033[7m' + YELLOW + original_word + '\033[0m')
+    sys.stdout.flush()
+    time.sleep(0.4)
+
+    # ── 4. Overwrite di tempat dengan corrected_word ──────────────────
+    sys.stdout.write(f'\033[{word_len}D')
+    sys.stdout.flush()
+    time.sleep(0.08)
 
     sys.stdout.write(CYAN)
-    for char in corrected:
+    for char in corrected_word:
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        time.sleep(speed)
+    sys.stdout.write(RESET)
+
+    # Bersihkan sisa karakter jika original lebih panjang dari corrected
+    diff = word_len - len(corrected_word)
+    if diff > 0:
+        sys.stdout.write(' ' * diff)      # timpa dengan spasi
+        sys.stdout.write(f'\033[{diff}D') # kursor balik
+        sys.stdout.flush()
+
+    # ── 5. Lanjut ketik text_after ────────────────────────────────────
+    sys.stdout.write(WHITE)
+    for char in text_after:
         sys.stdout.write(char)
         sys.stdout.flush()
         time.sleep(speed)
@@ -228,18 +291,11 @@ def password_prompt():
     Command prompt interaktif di awal sebelum animasi dimulai.
     Seperti password check di Program.cs referensi.
     """
-    clear_screen()
-    color_print(BOLD + "  +------------------------------------------------------+" + RESET, WHITE)
-    color_print(BOLD + "  |     BUG-MIKU  ANIMATION  TERMINAL   v 1.0.0          |" + RESET, WHITE)
-    color_print(BOLD + "  |       [ Kairiki Bear  feat.  Hatsune Miku ]           |" + RESET, WHITE)
-    color_print(BOLD + "  +------------------------------------------------------+" + RESET, WHITE)
     print()
     color_print("  System  : MikuOS  v2.0.6  (BugKernel)", GREEN)
     color_print("  Status  : INFECTED — 3 critical bugs detected", RED)
-    color_print("  Audio   : bugmiku.mp3  [loaded]", CYAN)
-    color_print("  Artist  : Kairiki Bear  feat.  Hatsune Miku", MAGENTA)
     print()
-    color_print("  Type  'bug.execute()'  to begin.", YELLOW)
+    color_print("  Type  'bug.execute()'  to remove the bug.", YELLOW)
     print()
 
     while True:
@@ -354,17 +410,19 @@ def main():
         {"time": 16.4, "action": "cprint", "text": "pa",                            "color": MAGENTA},
         {"time": 16.8, "action": "cprint", "text": "para",                          "color": MAGENTA},
         {"time": 17.4, "action": "cprint", "text": "paranoia",                      "color": RED},
-        {"time": 17.5, "action": "autocorrect",
-            "original":  "Giko giko mai kokoro sentei",
-            "corrected": "Giko giko my heart sentei"},
-        {"time": 21.0, "action": "cprint", "text": "Pa",                            "color": MAGENTA},
-        {"time": 21.4, "action": "cprint", "text": "pa",                            "color": MAGENTA},
-        {"time": 21.8, "action": "cprint", "text": "para",                          "color": MAGENTA},
-        {"time": 22.5, "action": "cprint", "text": "paranoia",                      "color": RED},
+        {"time": 19.2, "action": "autocorrect",
+            "text_before":    "Giko giko ",
+            "original":       "mai kokoro",
+            "corrected":      "my heart",
+            "text_after":     " sentei"},
+        {"time": 21.8, "action": "cprint", "text": "Pa",                            "color": MAGENTA},
+        {"time": 22.2, "action": "cprint", "text": "pa",                            "color": MAGENTA},
+        {"time": 22.7, "action": "cprint", "text": "para",                          "color": MAGENTA},
+        {"time": 23.2, "action": "cprint", "text": "paranoia",                      "color": RED},
 
         # ── [Verse 2] ~23.8s ─────────────────────────────────────
         #    Tairo tairo tatta karamatta
-        {"time": 23.5, "action": "clear"},
+        {"time": 24.2, "action": "clear"},
         {"time": 23.7, "action": "ctype",  "text": "Tairo tairo tatta karamatta",  "color": CYAN, "prefix": ""},
         {"time": 26.5, "action": "scroll", "lines": [
             '  >> MEMORY LEAK DETECTED at 0xDEADC0DE',
@@ -387,7 +445,7 @@ def main():
         # ── [Chorus 1] ~46s ──────────────────────────────────────
         #    Maa! zekkyouna kanjou rakka
         {"time": 45.8, "action": "clear"},
-        {"time": 46.0, "action": "art",    "target": "2_spider.txt"},
+        {"time": 46.0, "action": "art",    "target": "prts.txt"},
         {"time": 46.3, "action": "glitch", "text": 'Maa! zekkyouna kanjou rakka papparanoi-"a"', "color": CYAN, "loops": 7},
         {"time": 49.0, "action": "ctype",  "text": "Oboregoe agete wa guruguru",                 "color": MAGENTA, "prefix": ""},
         {"time": 51.5, "action": "cprint", "text": "Maa! zettai zetsumei rakka yatta ra metta ra","color": RED},
@@ -445,7 +503,8 @@ def main():
                                             "color": MAGENTA, "prefix": ""},
         {"time": 88.8, "action": "glitch", "text": "Kurukuru, kurukuru", 
                                             "color":MAGENTA, "loops": 5},
-        {"time": 90.0, "action": "cprint", "text": "Endoresu yami? ahaa!",          "color": RED},
+        {"time": 90.0, "action": "cprint", "text": "Endoresu yami?",          "color": RED},
+        {"time": 92.0, "action": "cprint", "text": "Ahaa!",          "color": MAGENTA},
 
         # ── [Verse 4] ~92.8s ─────────────────────────────────────
         #    Dakko dakko iranai ko da
@@ -458,44 +517,56 @@ def main():
             '  >> WARN:  world.continue()       returned  null',
         ], "delay": 0.5, "color": YELLOW},
         {"time": 98.0, "action": "ctype",  "text": 'Iiko iiko "Ganbare" no hanran', "color": CYAN, "prefix": ""},
-        {"time": 100.2,"action": "cprint", "text": "Adominisutoreita, aa!",          "color": RED},
+        {"time": 100.2, "action": "autocorrect",
+            "text_before":    "",
+            "original":       "Adominisutoreita",
+            "corrected":      "Administrator",
+            "text_after":     ""},
+        {"time": 102.2, "action": "ctype",  "text": 'Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', "color": RED, "prefix": ""},
 
         # ── [Bridge] ~104.8s ─────────────────────────────────────
         {"time": 104.5, "action": "clear"},
         {"time": 104.8, "action": "art",    "target": "5_lyrics.txt"},
-        {"time": 105.2, "action": "glitch", "text": "Ba-ba-bagu sa bagubagu",       "color": RED,     "loops": 4},
-        {"time": 107.2, "action": "glitch", "text": "Ra-ra-ragu rantaimu ragu",     "color": YELLOW,  "loops": 4},
-        {"time": 109.2, "action": "glitch", "text": "Ro-ro-rogu hankou no rogu",    "color": MAGENTA, "loops": 4},
-        {"time": 111.2, "action": "glitch", "text": "Ba-ba-bagu pa-pa-pa-la-pa",   "color": RED,     "loops": 4},
+        {"time": 107.2, "action": "scroll", "lines": [
+            '  >> ERROR:    OS Miku Is Not Found',
+            '  >> ERROR:    Anomaly prts.exe is infecting',
+            '  >> WARNING:  TOO MANY SYSTEM ERROR RESTARTING NOW',
+        ], "delay": 1.0, "color": RED},
+        {"time": 110.8, "action": "glitch", "text": "Ba-ba-bagu pa-pa-pa-la-pa",   "color": RED,     "loops": 4},
         {"time": 113.0, "action": "cprint", "text": 'Pa, paaranooi-"a"',             "color": CYAN},
         {"time": 114.5, "action": "cprint", "text": 'Pa, paaranooi-"a"',             "color": CYAN},
-        {"time": 116.3, "action": "cprint", "text": 'Pa, paaranooi-"a" iyaiya',     "color": MAGENTA},
+        {"time": 115.8, "action": "cprint", "text": 'Pa, paaranooi-"a" iyaiya',     "color": MAGENTA},
 
         # ── [Chorus 2] ~119.8s ───────────────────────────────────
-        {"time": 119.5, "action": "clear"},
-        {"time": 119.8, "action": "art",    "target": "2_spider.txt"},
-        {"time": 120.0, "action": "glitch", "text": 'Saa, zekkyouna kanjou rakka papparanoi-"a"',
+        {"time": 117.0, "action": "clear"},
+        {"time": 117.2, "action": "art",    "target": "prts.txt"},
+        {"time": 117.8, "action": "glitch", "text": 'Saa, zekkyouna kanjou rakka papparanoi-"a"',
                                              "color": CYAN,    "loops": 8},
-        {"time": 123.0, "action": "ctype",  "text": "Hidari migi yukue mo guruguru hisan",
+        {"time": 120.8, "action": "ctype",  "text": "Hidari migi yukue mo guruguru hisan",
                                              "color": MAGENTA, "prefix": ""},
-        {"time": 126.0, "action": "cprint", "text": "Genkai nou kurucchatte yatta ra metta ra", "color": RED},
-        {"time": 129.0, "action": "ctype",  "text": "Yami mayoe yoe inai inai baa",  "color": CYAN,    "prefix": ""},
-        {"time": 131.0, "action": "ctype",  "text": "Inai inai batten",               "color": MAGENTA, "prefix": ""},
-        {"time": 133.0, "action": "glitch", "text": 'Zekkyouna kanjou rakka papparanoi-"a"',
+        {"time": 123.8, "action": "cprint", "text": "Genkai nou kurucchatte yatta ra metta ra", "color": RED},
+        {"time": 125.8, "action": "ctype",  "text": "Yami mayoe yoe",  "color": CYAN,    "prefix": ""},
+         {"time": 127.0, "action": "scroll", "lines": [
+            '  Inai',
+            '  Inai, inai',
+            '  Inai, inai, baa',
+        ], "delay": 0.55, "color": MAGENTA},
+        {"time": 129.0, "action": "ctype",  "text": "Inai inai batten",               "color": MAGENTA, "prefix": ""},
+        {"time": 129.8, "action": "glitch", "text": 'Zekkyouna kanjou rakka papparanoi-"a"',
                                              "color": CYAN,    "loops": 7},
-        {"time": 136.0, "action": "cprint", "text": "Obore goe agete wa guruguru",    "color": MAGENTA},
-        {"time": 139.0, "action": "cprint", "text": "Maa! zettai zetsumei rakka yatta ra metta ra", "color": RED},
-        {"time": 142.0, "action": "ctype",  "text": "Kogoe kare hate iyaiya iya",     "color": CYAN, "prefix": ""},
+        {"time": 131.8, "action": "cprint", "text": "Obore goe agete wa guruguru",    "color": MAGENTA},
+        {"time": 134.8, "action": "cprint", "text": "Maa! zettai zetsumei rakka yatta ra metta ra", "color": RED},
+        {"time": 137.8, "action": "ctype",  "text": "Kogoe kare hate iyaiya iya",     "color": CYAN, "prefix": ""},
 
         # ── [Post-Chorus 2] ~144.8s ──────────────────────────────
-        {"time": 144.5, "action": "clear"},
-        {"time": 144.8, "action": "art",    "target": "8_heart.txt"},
-        {"time": 145.0, "action": "cprint", "text": "Saa ba-ba-bagu sa bagubagu",     "color": RED},
-        {"time": 147.0, "action": "cprint", "text": "Tadare are are hiai iyaiya",     "color": MAGENTA},
-        {"time": 149.0, "action": "glitch", "text": "Saa ba-ba-bagu sa bagubagu",     "color": RED,     "loops": 5},
-        {"time": 151.0, "action": "cprint", "text": "Kuro mamire risei iyaiya iya",  "color": MAGENTA},
-        {"time": 153.0, "action": "ctype",  "text": "Ima, ima, ima",                   "color": CYAN, "prefix": ""},
-        {"time": 155.0, "action": "scroll", "lines": [
+        {"time": 139.0, "action": "clear"},
+        {"time": 139.3, "action": "art",    "target": "8_heart.txt"},
+        {"time": 139.8, "action": "cprint", "text": "Saa ba-ba-bagu sa bagubagu",     "color": RED},
+        {"time": 142.8, "action": "cprint", "text": "Tadare are are hiai iyaiya",     "color": MAGENTA},
+        {"time": 145.2, "action": "glitch", "text": "Saa ba-ba-bagu sa bagubagu",     "color": RED,     "loops": 5},
+        {"time": 148.2, "action": "cprint", "text": "Kuro mamire risei iyaiya iya",  "color": MAGENTA},
+        {"time": 150.2, "action": "ctype",  "text": "Ima, ima, ima",                   "color": CYAN, "prefix": ""},
+        {"time": 152.2, "action": "scroll", "lines": [
             '  iyaiya...',
             '  iyaiya, iyaiya...',
             '  iyaiya, iyaiya, iyaiya...',
@@ -503,17 +574,19 @@ def main():
         ], "delay": 0.55, "color": MAGENTA},
 
         # ── [OUTRO] ~160s ────────────────────────────────────────
-        {"time": 159.5, "action": "clear"},
-        {"time": 159.8, "action": "rain",   "duration": 2.5, "color": CYAN},
+        {"time": 156.5, "action": "clear"},
+        {"time": 156.8, "action": "rain",   "duration": 2.5, "color": CYAN},
+        {"time": 159.5, "action": "scroll", "lines": [
+            '  >> OS Running Normally',
+            '  >> Running MikuOS...',
+            '  >> TERMIANTED: Bug has been removed',
+            '  >> ERROR:  prts.exe still infecting',
+        ], "delay": 0.55, "color": YELLOW},
         {"time": 162.5, "action": "clear"},
         {"time": 162.8, "action": "art",    "target": "10_end.txt"},
         {"time": 164.0, "action": "ctype",  "text": "bug.terminate()",              "color": YELLOW,  "prefix": "[System] ", "speed": 0.08},
         {"time": 166.0, "action": "bugscan","label": "Cleaning up memory...", "length": 12, "delay": 0.14, "color": GREEN},
         {"time": 169.5, "action": "clear"},
-        {"time": 169.8, "action": "art",    "target": "1_title.txt"},
-        {"time": 170.2, "action": "ctype",  "text": "--- E  N  D ---",              "color": CYAN, "prefix": ""},
-        {"time": 172.0, "action": "cprint", "text": "Animated by Nuthfih  |  Bug (c) Kairiki Bear  |  feat. Hatsune Miku",
-                                             "color": DIM},
     ]
 
     # ── Mulai musik ───────────────────────────────────────────
@@ -573,7 +646,12 @@ def main():
             )
 
         elif action == "autocorrect":
-            autocorrect_text(event["original"], event["corrected"])
+            autocorrect_text(
+                event.get("text_before", ""),
+                event["original"],
+                event["corrected"],
+                event.get("text_after", ""),
+            )
 
         elif action == "scroll":
             scroll_lines(
@@ -596,16 +674,14 @@ def main():
         elif action == "bsod":
             bsod_flash(times=event.get("times", 3))
 
-    # ── Tunggu musik selesai ──────────────────────────────────
-    print()
-    color_print("Sekuens animasi selesai.", GREEN)
+    # Stop musik dan tutup terminal
     try:
         import pygame
-        color_print("Menunggu musik selesai...", DIM)
-        while pygame.mixer.music.get_busy():
-            time.sleep(1)
-    except ImportError:
+        pygame.mixer.music.stop()
+        pygame.mixer.quit()
+    except Exception:
         pass
+    sys.exit(0)
 
 
 # ─────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 
  +-----------------------------------------+
  |  !! SYSTEM MALFUNCTION DETECTED !!      |
- |  CODE : B U G  /  S T A T U S : FATAL  |
+ |  CODE : B U G  /  S T A T U S : FATAL   |
  +-----------------------------------------+
 
  UnhandledException: NullReferenceException

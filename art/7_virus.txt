@@ -4,7 +4,7 @@
   [>>] Scanning : ################  100%
   [!!] Infected : heart.dll
   [!!] Infected : soul.core
-  [!!] Infected : emotion.exe
+  [!!] Infected : prts.exe
   [>>] Threat   : BUG/Paranoia.A
   [>>] Severity : CRITICAL
 

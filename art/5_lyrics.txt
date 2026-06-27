@@ -1,12 +1,29 @@
 
-  +---------------------------------+
-  |                                 |
-  |   B A - B A - B U G             |
-  |          S A  B A G U B A G U   |
-  |                                 |
-  |   R A - R A - R A G U           |
-  |   R O - R O - R O G U           |
-  |                                 |
-  |   P A R A N O I A . . .         |
-  |                                 |
-  +---------------------------------+
+ ________________________________________________________________________
+
+ A fatal exception has occurred and your HEART has been shut down to
+ prevent further damage to your soul.
+
+ BUG_PARANOIA_EXCEPTION  (0x000B00BUG)
+
+ If this is the first time you have seen this error screen, try to
+ forget it. If this screen appears again, you are already infected.
+
+ Check to make sure all emotional drivers are properly installed.
+ If problems persist, disable all feelings or remove the BUG.
+ Warning: the BUG cannot be removed. It has nested too deeply.
+
+ Corrupted modules dump:
+
+   heart.dll    
+   prts.exe
+   logic.sys     
+   paranoia.drv  
+
+ Technical information:
+
+ *** STOP: 0xBA_BA_BAGU (RA_RA_RAGU, RO_RO_ROGU, PARANOIA)
+
+ Dumping emotional core to memory..............
+
+ ________________________________________________________________________
